@@ -1,7 +1,30 @@
-### add person
-POST http://localhost:8080/add-person
+###
+POST http://localhost:8080/register-account-declarative
 Content-Type: application/json
 
 {
-  "firstName": ""
+  "firstName": "faaa",
+  "lastName": "",
+  "personAddress": {
+    "street": "sdf",
+    "city": "sdfasdf"
+  },
+  "phoneNumber": "34534534",
+  "personType": "STUDENT"
+}
+
+
+###
+POST http://localhost:8080/register-account-programmatic
+Content-Type: application/json
+
+{
+  "firstName": "faaa",
+  "lastName": "",
+  "personAddress": {
+    "street": "sdf",
+    "city": "sdfasdf"
+  },
+  "phoneNumber": "asdasdaassad",
+  "personType": "STUDENT"
 }
