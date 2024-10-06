@@ -4,15 +4,17 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import pl.romczaj.validation.person.email.EmailAvailable;
 import pl.romczaj.validation.person.enums.EnumConstraint;
 import pl.romczaj.validation.person.phone.PhoneNumberAvailable;
 
-record RegisterAccountRequest(
+public record RegisterAccountRequest(
     @NotEmpty String firstName,
     @NotEmpty String lastName,
-    @NotNull @Email String email,
+    @NotNull @Email @EmailAvailable String email,
     @NotNull @Valid PersonAddress personAddress,
-    @NotNull @PhoneNumberAvailable String phoneNumber,
+    @NotNull @Pattern(regexp = "\\d{9}") @PhoneNumberAvailable String phoneNumber,
     @NotNull @EnumConstraint(PersonType.class) String personType
 ) {
 

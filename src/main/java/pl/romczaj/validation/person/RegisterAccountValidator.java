@@ -23,79 +23,61 @@ public class RegisterAccountValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        log.info("supports called");
-        return RegisterAccountRequest.class.equals(clazz);
+        return RegisterAccountRequestProgrammatic.class.equals(clazz);
     }
 
     @Override
     public void validate(Object target, Errors errors) {
-        log.info("validate called");
-        RegisterAccountRequest request = (RegisterAccountRequest) target;
+        RegisterAccountRequestProgrammatic request = (RegisterAccountRequestProgrammatic) target;
 
-        boolean isEmailAlreadyUsed = emailRegistry.isAlreadyUsed(request.email());
-        if (isEmailAlreadyUsed) {
-            errors.reject("ER_001", "Email already used");
-            throw new ProgrammaticValidationException(errors);
-        }
-
-        boolean emailFormatValid = EmailValidator.getInstance().isValid(request.email());
-        if (!emailFormatValid) {
-            rejectIfEmptyOrWhitespace(errors, "email", "ER_01", "Email invalid format");
-        }
+        validateEmail(request, errors);
+        validatePhoneNumber(request, errors);
+        validatePersonAddress(request, errors);
 
         rejectIfEmptyOrWhitespace(errors, "firstName", "NotEmpty");
         rejectIfEmptyOrWhitespace(errors, "lastName", "NotEmpty", "Nie może być puste");
 
-        PersonAddress personAddress = request.personAddress();
-
-        //ValidationCommand<PersonAddress> personAddressValidationCommand = new ValidationCommand<>()
-
-        if (personAddress == null) {
-            errors.rejectValue("personAddress", "asds", null, "address not null");
-        } else {
-            rejectIfEmptyOrWhitespace(errors, "personAddress.city", "NotEmpty");
-            rejectIfEmptyOrWhitespace(errors, "personAddress.street", "NotEmpty");
+        if (errors.hasErrors()) {
+            throw new ProgrammaticValidationException(errors);
         }
+    }
 
-        FlatObjectValidationUtil emailAddressValidation = new FlatObjectValidationUtil(
-            request.email(), null, EmailValidator.getInstance()::isValid, null);
-        ValidationResult emailValidationResult = emailAddressValidation.validate();
+    private void validateEmail(RegisterAccountRequestProgrammatic request, Errors errors) {
+        ValidationResult emailValidationResult = ObjectValidator.of(
+                request.email(), null, EmailValidator.getInstance()::isValid, emailRegistry::isAvailable)
+            .validate();
 
-        switch (emailValidationResult){
+        switch (emailValidationResult) {
             case NULL_FIELD -> errors.rejectValue("email", "NOT_NULL");
             case INCORRECT_FORMAT -> errors.rejectValue("email", "INCORRECT_FORMAT");
-            case INCORRECT_VALUE -> errors.rejectValue("email", "INCORRECT_VALUE", "Email is already used");
+            case INCORRECT_VALUE ->  errors.rejectValue("email", "INCORRECT_VALUE", "Email is already used");
             case CORRECT -> {}
         }
+    }
 
-        FlatObjectValidationUtil phoneNumberValidation = new FlatObjectValidationUtil(
-            request.phoneNumber(), "\\d+", null, phoneNumberRegistry::isAvailable);
-        ValidationResult validate = phoneNumberValidation.validate();
+    private void validatePhoneNumber(RegisterAccountRequestProgrammatic request, Errors errors) {
+        ValidationResult validationResult = ObjectValidator.of(
+                request.phoneNumber(), "\\d{9}", null, phoneNumberRegistry::isAvailable)
+            .validate();
 
-        switch (validate) {
+        switch (validationResult) {
             case NULL_FIELD -> errors.rejectValue("phoneNumber", "NOT_NULL");
             case INCORRECT_FORMAT -> errors.rejectValue("phoneNumber", "INCORRECT_FORMAT");
             case INCORRECT_VALUE -> errors.rejectValue("phoneNumber", "INCORRECT_VALUE", "Phone number is already used");
             case CORRECT -> {}
         }
+    }
 
-//        if (phoneNumber == null) {
-//            errors.rejectValue("phoneNumber", "ERR5", null, "phone number not null");
-//        } else {
-//            boolean phoneNumberAvailable = phoneNumberRegistry.isAvailable(phoneNumber);
-//            if (!phoneNumberAvailable) {
-//                errors.rejectValue("phoneNumber", "ERR6", null, "phone number is not available");
-//            }
-//        }
-
-        if(errors.hasErrors()){
-            throw new ProgrammaticValidationException(errors);
+    private void validatePersonAddress(RegisterAccountRequestProgrammatic request, Errors errors) {
+        PersonAddress personAddress = request.personAddress();
+        ValidationResult validationResult = ObjectValidator.onlyNonNull(personAddress).validate();
+        switch (validationResult) {
+            case NULL_FIELD -> errors.rejectValue("personAddress", "NOT_NULL");
+            case CORRECT -> {
+                rejectIfEmptyOrWhitespace(errors, "personAddress.city", "NotEmpty");
+                rejectIfEmptyOrWhitespace(errors, "personAddress.street", "NotEmpty");
+            }
+            default -> {}
         }
-
-        // Add additional validation logic
-        // Example:
-        // if (user.getUsername().length() < 5) {
-        //     errors.rejectValue("username", "Size.userForm.username");
-        // }
     }
 }

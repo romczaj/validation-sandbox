@@ -12,11 +12,6 @@ public class PhoneNumberAvailableValidator implements ConstraintValidator<PhoneN
     private final PhoneNumberRegistry phoneNumberRegistry;
 
     @Override
-    public void initialize(PhoneNumberAvailable contactNumber) {
-
-    }
-
-    @Override
     public boolean isValid(String phoneNumber, ConstraintValidatorContext cxt) {
         if (phoneNumber == null) {
             return true;

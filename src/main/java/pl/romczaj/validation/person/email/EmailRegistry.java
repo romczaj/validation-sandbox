@@ -14,7 +14,7 @@ public class EmailRegistry {
         emailDatabase.add("jan.kowalski@email.com");
     }
 
-    public boolean isAlreadyUsed(String email) {
-        return emailDatabase.contains(email);
+    public boolean isAvailable(String email) {
+        return !emailDatabase.contains(email);
     }
 }

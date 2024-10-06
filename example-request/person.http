@@ -3,13 +3,14 @@ POST http://localhost:8080/register-account-declarative
 Content-Type: application/json
 
 {
-  "firstName": "faaa",
-  "lastName": "",
+  "firstName": "Jan",
+  "lastName": "Kowalski",
   "personAddress": {
-    "street": "sdf",
-    "city": "sdfasdf"
+    "street": "Super",
+    "city": "Warsaw"
   },
-  "phoneNumber": "34534534",
+  "email": "jan.kowalski@email.com",
+  "phoneNumber": "123123123",
   "personType": "STUDENT"
 }
 
@@ -19,12 +20,13 @@ POST http://localhost:8080/register-account-programmatic
 Content-Type: application/json
 
 {
-  "firstName": "faaa",
-  "lastName": "",
+  "firstName": "Jan",
+  "lastName": "Kowalski",
   "personAddress": {
-    "street": "sdf",
-    "city": "sdfasdf"
+    "street": "Super",
+    "city": "Warsaw"
   },
-  "phoneNumber": "asdasdaassad",
+  "email": "jan.kowalski2@email.com",
+  "phoneNumber": "123123123",
   "personType": "STUDENT"
 }
